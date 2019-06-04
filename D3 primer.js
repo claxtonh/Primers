@@ -16,6 +16,10 @@ var clip = d3.selectALL(ul);
 clip.data().style("height", function(d){return d;});  // then use selection.  to call it later.
     // you can merge two selections (clip) & (clop) using the merge function
 clip.enter().append("div").merge(clop);
+    // remember that as you chain things, the next element only affects what was next in the chain.  for instance, 
+clip.enter().append("div").text(function(d){return d;}); // the text will only show up in the elements that were appended.  Anything before append was not included.
+    // merging
+
 
 
 //** Binding Data with append and enter and showing the data
@@ -60,6 +64,24 @@ d3.selectALL("li").data(numbers)
     .text(function(d){ return d;});
     // If you run this code after adding the 1, 2, 3.  Your output will be 1, 2, 3, 17, 18.  The data is only added to the empty slots, and the append will only add what is necessary.
 
+//** Updating, adding and merging data 
+// remember that as you chain things, the next element only affects what was next in the chain.  for instance, 
+d3.selectALL("li").data(numbers).enter().append("div").text(function(d){return d;}); // the text will only show up in the elements that were appended.  Anything before append was not included. See previous example
+    //BUT if you use
+d3.selectALL("li").data(numbers).text(function(d){return d;}); // all of the items will be updated, because it hasn't been further filtered before reaching the .text statement
+// use merge to update all elements after you've added on to them.
+// Imagine three <li> elements already exist on the page.  
+var clip = d3.selectAll("li")
+    .data(numbers);    
+clip.enter()  // everything after enter deals with things that do not already have an element on the html page.
+    .append("li")
+    .merge(clip) // merge allows us to create one definition of all the elements (those already on the page, and those being added via enter) 
+    .text(function(d){
+        return d;
+    });
+//notice that we're merging clip with an earlier version of itself (before chaining). So we're including the elements that were newly appended AND the elements taht were originally captured in the first selectALL
+
+
 
 //removing data you use .exit()
 var numbers = [14, 15, 16, 17, 18]
@@ -93,7 +115,7 @@ d3.select("p").selectALL("li") // selects all lis within a paragraph
     .data(links)
     .enter()  // this links the data and identifies which elements are present or needed
     .append("li") // if there are not enough li, they will be added
-    .classed("strong", true) // this sets the class of the lis that will be added
+    .classed("strong", true) // this sets the class of the lis that will be added.  The True means add it if it's mot there.  False would mean remove it if it is there.
     .html(function(d) {      // note that you will need to use the .html to show this data
         return `<a href="${d.url}">`;  // note the "" are there because they are necessary around a url.  They are unnecessary to add tables
     });
@@ -133,8 +155,15 @@ d3.select("tbody")
         .classed("classname", true)
         .style("weight", function(d){   
             return d + "px";
-    };
+    }
 
-
+// reading in a csv file.
+//The csv requires 2 things,  1) the path of the file 2) a function
+// The function runs after you've obtained the data (like a promise, actually it's a callback)
+// The function expects a variable for the error in the first parameter, and a variable to capture the data in the second parameter
+d3.csv("./name_of_file", function(error, data_from_csv){
+    if (error) return console.warn(error);  // this will display the error, if an error has been caught
+    console.log(data);
+});
 
     
