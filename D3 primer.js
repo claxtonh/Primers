@@ -164,6 +164,86 @@ d3.select("tbody")
 d3.csv("./name_of_file", function(error, data_from_csv){
     if (error) return console.warn(error);  // this will display the error, if an error has been caught
     console.log(data);
-});
+    // working with the data brought in from d3 is like working with a javasctipt object when loading a csv
+    // if the csv looks like this:
+    /*
+    color,count
+    red,14
+    blue,23
+    green,67
+    pink,45
+    yellow,90
+    */
+   // To be able to read it, you would need to cast the count data as an int (because it's automatically loaded as a string)
+   // To cast it, you would use
+   data_from_csv.forEach(function(d){ 
+   data_from_csv.count = +data_from_csv.count;
+   });
 
-    
+
+
+
+
+});
+   
+//min max and extent functions
+var numbers = [4, 16, 5, 90, 45];
+console.log("This is the min value", d3.min(numbers));
+console.log("This is the maximum number", d3.max(numbers));
+console.log("This returns an array of two numbers min and max", d3.extent(numbers));
+// to use extent to look through all of the fields of an array of objects:
+var objects = [
+    {
+        "id": 34,
+        "color": "blue",
+        "count" : 45 
+    },
+    {
+        "id": 35,
+        "color": "black",
+        "count" : 67
+    },
+    {
+        "id": 35,
+        "color": "green",
+        "count": 78 
+
+    }
+];
+console.log(d3.extent(data, function(d) {return +d.count}));  // the + is to make sure it returns value as an int, not a string
+    // as an arrow function\
+console.log(d3.extent(data, d => +d.count)
+
+
+
+//**  scaling data
+// This is useful when you want your data to fill up the full space of the graph (SVG, canvas, etc).\
+var scale_this_num = d3.scaleLinear()  // note, this is a variable holding a function.
+    .domain([5, 400])  // given numbers will be between 5 and 400
+    .range([0, 5000]);  // This is how much space we actuall have.  basically, we're stretching/shrinking the domain to fit the range in a linear fashion
+    // so, to scale, put the number you want scaled in the new function as such
+    console.log(`Here is the number 45 scaled", ${scale_this_num(45)}`);
+
+// scaling data you're not certain of the numbers in a dataset (or they are constantly changing?)
+// Use the extend methed
+var scale_this_num = d3.scaleLinear().domain(d3.extent(numbers)).range([0, svgHeight]);
+
+// Scaling to bands on x axes
+// For instance, imagine you have a graph where the X axis is a list of store names, isntead of numbers.
+//However, you still want the X axes to scale to fit the full page.
+var Num_of_Stores = [6, 8, 23, 15];
+var Name_of_Stores = ["Starbucks", "Seattle's Coffee", "Coffee Shop", "Latta Lattes"];
+
+var xaxes = d3.scaleBand()
+    .domain(Name_of_Stores)
+    .range([0, svgWidth]);
+// now to see the x coordinates where these store names will show up 
+console.log(`first store x coord: ${xaxes("Starbucks")}`);
+console.log(`second store x coord:  ${xaxes(Name_of_Stores[1])}`);
+// if you want to see how many pixels wide each band is, you can use the .bandwidth() method
+console.log(xaxes.bandwidth());
+
+
+//** Ways to modify the Axes
+
+
