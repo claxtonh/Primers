@@ -149,7 +149,61 @@ male        over 16       0                 1           0                       
 
 
 ## Scaling and normalizing data -- especially important for models that use gradient descent algorithms
+#common scaling options are minmax and StandardScaler.  StandardScaler is preferred if you don't know anything about your data.
+#Standard scaler applies a Guassian distribution to the data.  the mean is 0 ad teh standard deviation is 1.
+
+#Step 1 is to split your data.
+from sklearn.preprocessing import StandardScaler
+X_scaler = StandardScaler().fit(X_train)
+y_scaler = StandardScaler().fit(y_train)
+    #Then use scaler to create the scaled dataset
+X_train_scaled = X_scaler.transform(X_train)
+X_test_scaled = X_scaler.transform(X_test)
+y_train_scaled = y_scaler.transform(y_train)
+y_test_scaled = y_scaler.transform(y_test)
+    # To create plots that show the difference between scaled data and non scaled data, use this code straight from class
+    # The scaled data looks more spread out.
+fig1 = plt.figure(figsize=(12, 6))
+axes1 = fig1.add_subplot(1, 2, 1)
+axes2 = fig1.add_subplot(1, 2, 2)
+
+axes1.set_title("Original Data")
+axes2.set_title("Scaled Data")
+
+maxx = X_train["size"].max()
+maxy = y_train.max()
+axes1.set_xlim(-maxx + 1, maxx + 1)
+axes1.set_ylim(-maxy + 1, maxy + 1)
+
+axes2.set_xlim(-2, 2)
+axes2.set_ylim(-2, 2)
+
+def set_axes(ax):
+    ax.spines['left'].set_position('center')
+    ax.spines['right'].set_color('none')
+    ax.spines['bottom'].set_position('center')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+    
+set_axes(axes1)
+set_axes(axes2)
+
+axes1.scatter(X_train["size"], y_train)
+axes2.scatter(X_train_scaled[:,0], y_train_scaled[:])
 
 
-
-
+## Logistic Regression -- Used for categories like Yes, No  or  Red vs Yellow.
+#To generate data you can use make_blobs
+from sklearn.datasets import make_blobs
+X, y = make_blobs(centers=2, random_state=42)   
+    ##  you can create a class of LogisticRegression which will sort your data into two bins
+from sklearn.linear_model import LogisticRegression
+classifier = LogisticRegression()
+classifier.fit(X_train, y_train)  ## This creates your logistics regression model
+    #Get the score.  
+print(f"Training Data Score: {classifier.score(X_train, y_train)}")
+print(f"Testing Data Score: {classifier.score(X_test, y_test)}")
+    #Then see how close youre predictions where via table
+predictions = classifier.predict(X_test)
+pd.DataFrame({"Prediction": predictions, "Actual": y_test})
