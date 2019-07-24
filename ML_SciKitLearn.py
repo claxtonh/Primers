@@ -94,7 +94,8 @@ model.score(X, y) # is the R2 score for full model
 
 ## Creating testing and training data
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 42, stratify = y) # The stratify means that the testing data and training 
+#data will contain the same ratio. For instance, if the training data is 60% female, the testing data will also be 60% female.
 
 
 ## Multiple Linear Regression
@@ -197,6 +198,7 @@ axes2.scatter(X_train_scaled[:,0], y_train_scaled[:])
 #To generate data you can use make_blobs
 from sklearn.datasets import make_blobs
 X, y = make_blobs(centers=2, random_state=42)   
+plt.scatter(X[:, 0], X[:,1], c=y)  ## use this to look at the data you created and ensure that you have two clusters in your data.
     ##  you can create a class of LogisticRegression which will sort your data into two bins
 from sklearn.linear_model import LogisticRegression
 classifier = LogisticRegression()
@@ -206,4 +208,38 @@ print(f"Training Data Score: {classifier.score(X_train, y_train)}")
 print(f"Testing Data Score: {classifier.score(X_test, y_test)}")
     #Then see how close youre predictions where via table
 predictions = classifier.predict(X_test)
-pd.DataFrame({"Prediction": predictions, "Actual": y_test})
+pd.DataFrame({"Prediction": predictions, "Actual": y_test}) ## pandas makes a good way to look at how close you were.
+
+
+
+## How to create a Decision Tree
+from sklearn import tree
+from sklearn.datasets import load_iris  ## This is one of the available datasets that comes with sklearn
+
+iris = load_iris() ## to get the dataset
+clf = tree.DecisionTreeClassifier()  # This creates the decision tree
+clf = clf.fit(iris.data, iris.target)  # This fits the data to the decision tree.  .data is the dependent variabvle data that will be fit (the size of petals, stems, etc),  .target is the independent variable, the goal, (the name of the species)
+
+import graphviz ## This allows us to view a picture of the decision tree
+dot_data = tree.export_graphviz(clf, out_file=None, feature_names = iris.feature_names, class_names = iris.target_names, filled=True, rounded=True, special_characters=True)
+  #features refers to the things that are being considered, ie, the size of petals, stems, etc.
+
+import pydotplus 
+graph = pydotplus.graph_from_dot_data(dot_data)
+graph.write_png('iris.png')
+graph = graphviz.Source(dot_data)
+graph
+
+
+
+#How to create a Random Forest
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import load_iris
+    #To print the description of the iris set (or any other set)
+iris = load_iris()
+print(iris.DESCR)
+    #Create the random forest classifier
+rf = RandomForestClassifier(n_estimators = 200)  # n_estimators is how many trees we want.  Each tree is called an estimator
+rf = rf.fit(iris.data, iris.target)
+    #Random Forests in sklearn will automatically calculate feature importance
+    
